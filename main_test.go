@@ -56,57 +56,72 @@ func TestGetFileName(t *testing.T) {
 	}
 }
 
-/**
-func getSpecifiedExtFileName(absPath string, exts []string) []os.DirEntry {
-	var filesFiltered []os.DirEntry
-	files := getFileName(absPath)
+func TestGetSpecifiedExtFileName(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "example")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
 
-	for _, file := range files {
-		if containExt(file.Name(), exts) {
-			filesFiltered = append(filesFiltered, file)
+	os.WriteFile(filepath.Join(tempDir, "file.txt"), []byte("text file"), 0644)
+	os.WriteFile(filepath.Join(tempDir, "file.go"), []byte("package main"), 0644)
+	os.WriteFile(filepath.Join(tempDir, "image.jpg"), []byte("jpg image"), 0644)
+	os.WriteFile(filepath.Join(tempDir, "README.md"), []byte("markdown"), 0644)
+
+	exts := []string{".txt", ".go"}
+	result := getSpecifiedExtFileName(tempDir, exts)
+
+	expectedFiles := map[string]bool{
+		"file.txt": true,
+		"file.go":  true,
+	}
+
+	for _, file := range result {
+		if !expectedFiles[file.Name()] {
+			t.Errorf("Unexpected file: %s", file.Name())
+		}
+		delete(expectedFiles, file.Name())
+	}
+
+	if len(expectedFiles) != 0 {
+		t.Errorf("Some expected files were not found: %v", expectedFiles)
+	}
+}
+
+func TestContainExt(t *testing.T) {
+	tests := []struct {
+		fileName string
+		exts     []string
+		expected bool
+	}{
+		{"example.txt", []string{".txt"}, true},
+		{"example.txt", []string{".t"}, true},
+		{"example.txt", []string{".exe"}, false},
+		{"example.jpg", []string{".png", ".jpg"}, true},
+		{"example.txt", []string{}, false},
+		{"file.go.txt", []string{".go"}, true},
+	}
+
+	for _, tt := range tests {
+		result := containExt(tt.fileName, tt.exts)
+		if result != tt.expected {
+			t.Errorf("containExt(%q, %v) = %v, want %v",
+				tt.fileName, tt.exts, result, tt.expected)
 		}
 	}
-
-	return filesFiltered
 }
 
-func containExt(fileName string, exts []string) bool {
-	for _, ext := range exts {
-		if strings.Contains(fileName, ext) {
-			return true
-		}
+func TestDisplay(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "example")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
 	}
+	defer os.RemoveAll(tempDir)
 
-	return false
+	os.WriteFile(filepath.Join(tempDir, "file.go"), []byte("package main"), 0644)
+	os.WriteFile(filepath.Join(tempDir, "file.txt"), []byte("sample text"), 0644)
+	os.WriteFile(filepath.Join(tempDir, "README.md"), []byte("# Readme"), 0644)
+
+	exts := []string{".go", ".md"}
+	display(tempDir, exts)
 }
-
-func display(dir string, exts []string) {
-	var files []os.DirEntry
-
-	if exts[0] == "" {
-		files = getFileName(getAbsPath(dir))
-	} else {
-		files = getSpecifiedExtFileName(getAbsPath(dir), exts)
-	}
-
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{getDirName(dir)})
-	table.SetBorder(true)
-
-	for _, file := range files {
-		table.Append([]string{file.Name()})
-	}
-
-	table.Render()
-}
-
-func main() {
-	dir := flag.String("dir", ".", "specify the directory name you want.")
-	exts := flag.String("ext", "", "specify extentions you want. Separate by slash.")
-	flag.Parse()
-
-	extList := strings.Split(*exts, "/")
-
-	display(*dir, extList)
-}
-**/
