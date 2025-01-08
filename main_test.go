@@ -15,7 +15,10 @@ func TestGetAbsPath(t *testing.T) {
 
 	expected, _ := filepath.Abs(tempDir)
 
-	absPath := getAbsPath(tempDir)
+	absPath, err := getAbsPath(tempDir)
+	if err != nil {
+		t.Errorf("failed to get absolute path: %v", err)
+	}
 	if absPath != expected {
 		t.Errorf("Expected %s, but got %s", expected, absPath)
 	}
@@ -28,7 +31,11 @@ func TestGetDirName(t *testing.T) {
 	}
 	defer os.RemoveAll(tempDir)
 
-	expected := filepath.Base(getAbsPath(tempDir))
+	absPath, err := getAbsPath(tempDir)
+	if err != nil {
+		t.Errorf("failed to get absolute path: %v", err)
+	}
+	expected := filepath.Base(absPath)
 
 	dirName := getDirName(tempDir)
 	if dirName != expected {
@@ -69,7 +76,10 @@ func TestGetSpecifiedExtFileName(t *testing.T) {
 	os.WriteFile(filepath.Join(tempDir, "README.md"), []byte("markdown"), 0644)
 
 	exts := []string{".txt", ".go"}
-	result := getSpecifiedExtFileName(tempDir, exts)
+	result, err := getSpecifiedExtFileName(tempDir, exts)
+	if err != nil {
+		t.Errorf("Error reading files from %s: %v", tempDir, err)
+	}
 
 	expectedFiles := map[string]bool{
 		"file.txt": true,
@@ -95,11 +105,11 @@ func TestContainExt(t *testing.T) {
 		expected bool
 	}{
 		{"example.txt", []string{".txt"}, true},
-		{"example.txt", []string{".t"}, true},
+		{"example.txt", []string{".t"}, false},
 		{"example.txt", []string{".exe"}, false},
 		{"example.jpg", []string{".png", ".jpg"}, true},
 		{"example.txt", []string{}, false},
-		{"file.go.txt", []string{".go"}, true},
+		{"file.go", []string{".go"}, true},
 	}
 
 	for _, tt := range tests {

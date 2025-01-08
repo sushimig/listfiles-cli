@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -10,35 +11,39 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-func getAbsPath(path string) string {
+func getAbsPath(path string) (string, error) {
 	absPath, err := filepath.Abs(path)
 	if err != nil {
-		log.Fatalf("Getting path failed: %v\n", err)
+		return "", fmt.Errorf("failed to get absolute path: %v", err)
 	}
 
-	return absPath
+	return absPath, nil
 }
 
 func getDirName(path string) string {
-	absPath := getAbsPath(path)
-
-	dirName := filepath.Base(absPath)
-
-	return dirName
-}
-
-func getFileName(absPath string) []os.DirEntry {
-	files, err := os.ReadDir(absPath)
+	absPath, err := getAbsPath(path)
 	if err != nil {
-		log.Fatalf("Getting files name failed: %v\n", err)
+		return "unkonow"
 	}
 
-	return files
+	return filepath.Base(absPath)
 }
 
-func getSpecifiedExtFileName(absPath string, exts []string) []os.DirEntry {
+func getFileName(absPath string) ([]os.DirEntry, error) {
+	files, err := os.ReadDir(absPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read directory: %v", err)
+	}
+
+	return files, nil
+}
+
+func getSpecifiedExtFileName(absPath string, exts []string) ([]os.DirEntry, error) {
 	var filesFiltered []os.DirEntry
-	files := getFileName(absPath)
+	files, err := getFileName(absPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get file name: %v", err)
+	}
 
 	for _, file := range files {
 		if containExt(file.Name(), exts) {
@@ -46,12 +51,13 @@ func getSpecifiedExtFileName(absPath string, exts []string) []os.DirEntry {
 		}
 	}
 
-	return filesFiltered
+	return filesFiltered, nil
 }
 
 func containExt(fileName string, exts []string) bool {
+	fileExt := filepath.Ext(fileName)
 	for _, ext := range exts {
-		if strings.Contains(fileName, ext) {
+		if fileExt == ext {
 			return true
 		}
 	}
@@ -60,16 +66,37 @@ func containExt(fileName string, exts []string) bool {
 }
 
 func display(dir string, exts []string) {
-	var files []os.DirEntry
+	var (
+		files []os.DirEntry
+		err   error
+	)
 
-	if exts[0] == "" {
-		files = getFileName(getAbsPath(dir))
-	} else {
-		files = getSpecifiedExtFileName(getAbsPath(dir), exts)
+	absPath, err := getAbsPath(dir)
+	if err != nil {
+		log.Printf("Warning: %v. Using current directory instead.", err)
+		absPath, err = getAbsPath(".")
+		if err != nil {
+			log.Fatalf("Critical error: Failed to get current directory: %v", err)
+		}
 	}
 
+	if exts[0] == "" {
+		files, err = getFileName(absPath)
+	} else {
+		files, err = getSpecifiedExtFileName(absPath, exts)
+	}
+
+	if err != nil {
+		log.Printf("Error reading files from %s: %v", absPath, err)
+		return
+	}
+
+	dirName := getDirName(dir)
+	if dirName == "unknown" {
+		log.Printf("Warning: Failed to get directory name for %s. Using 'unknown'.", dir)
+	}
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{getDirName(dir)})
+	table.SetHeader([]string{dirName})
 	table.SetBorder(true)
 
 	for _, file := range files {
