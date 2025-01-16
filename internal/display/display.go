@@ -2,14 +2,13 @@ package display
 
 import (
 	"listfiles-cli/internal/dirutils"
+	"listfiles-cli/internal/display/format"
 	"listfiles-cli/internal/fileutils"
 	"log"
 	"os"
-
-	"github.com/olekukonko/tablewriter"
 )
 
-func Display(dir string, exts []string) {
+func Display(dir string, exts []string, isJson bool) {
 	var (
 		files []os.DirEntry
 		err   error
@@ -39,13 +38,10 @@ func Display(dir string, exts []string) {
 	if dirName == "unknown" {
 		log.Printf("Warning: Failed to get directory name for %s. Using 'unknown'.", dir)
 	}
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{dirName})
-	table.SetBorder(true)
 
-	for _, file := range files {
-		table.Append([]string{file.Name()})
+	if isJson {
+		format.DisplayJson(dirName, files)
+	} else {
+		format.DisplayText(dirName, files)
 	}
-
-	table.Render()
 }
