@@ -17,8 +17,54 @@ listfile-cli <path> [<flags>]
 
 you can get some list-formats! 
 - simple text
+
+
+```
++---------------+
+| LISTFILES-CLI |
++---------------+
+| .git          |
+| LICENSE       |
+| cmd           |
+| go.mod        |
+| go.sum        |
+| internal      |
+| main.go       |
++---------------+
+```
+
 - markdown
+
+```
+| listfiles-cli |
+|------|
+| .git |
+| LICENSE |
+| README.md |
+| cmd |
+| go.mod |
+| go.sum |
+| internal |
+| main.go |
+```
+
 - json
+
+```
+{
+                "directory": "listfiles-cli",
+                "files": [
+                                ".git",
+                                "LICENSE",
+                                "README.md",
+                                "cmd",
+                                "go.mod",
+                                "go.sum",
+                                "internal",
+                                "main.go"
+                ]
+}
+```
 
 Get a help from the following command!
 

@@ -42,7 +42,7 @@ func Display(dir string, exts []string, isJson bool, isMarkdown bool) {
 	if isJson {
 		format.DisplayJson(dirName, files)
 	} else if isMarkdown {
-		format.DisplayText(dirName, files)
+		format.DisplayMarkdown(dirName, files)
 	} else {
 		format.DisplayText(dirName, files)
 	}
