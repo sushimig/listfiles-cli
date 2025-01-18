@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 sushiming
+Copyright © 2025 sushimig
 */
 package main
 

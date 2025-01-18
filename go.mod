@@ -1,4 +1,4 @@
-module listfiles-cli
+module github.com/sushimig/listfiles-cli
 
 go 1.23.2
 
