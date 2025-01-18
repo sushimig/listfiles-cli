@@ -1,5 +1,5 @@
 # listfiles-cli
-listfiles-cli is a tool which can display a directory name and its file's names. Use this if you want to visualize directory structure and format into some kinds of data. 
+listfiles-cli is a tool which can display a directory name and its file's names. Use this if you want to visualize directory structure and format into some kinds of data to share documents!
 
 ## Installation
 
