@@ -1,32 +1,31 @@
 package display
 
 import (
-	"listfiles-cli/internal/dirutils"
 	"listfiles-cli/internal/display/format"
-	"listfiles-cli/internal/fileutils"
+	"listfiles-cli/internal/utils"
 	"log"
 	"os"
 )
 
-func Display(dir string, exts []string, isJson bool) {
+func Display(dir string, exts []string, isJson bool, isMarkdown bool) {
 	var (
 		files []os.DirEntry
-		err   errssor
+		err   error
 	)
 
-	absPath, err := dirutils.GetAbsPath(dir)
+	absPath, err := utils.GetAbsPath(dir)
 	if err != nil {
 		log.Printf("Warning: %v. Using current directory instead.", err)
-		absPath, err = dirutils.GetAbsPath(".")
+		absPath, err = utils.GetAbsPath(".")
 		if err != nil {
 			log.Fatalf("Critical error: Failed to get current directory: %v", err)
 		}
 	}
 
 	if exts[0] == "" {
-		files, err = fileutils.GetFileName(absPath)
+		files, err = utils.GetFileName(absPath)
 	} else {
-		files, err = fileutils.GetSpecifiedExtFileName(absPath, exts)
+		files, err = utils.GetSpecifiedExtFileName(absPath, exts)
 	}
 
 	if err != nil {
@@ -34,13 +33,15 @@ func Display(dir string, exts []string, isJson bool) {
 		return
 	}
 
-	dirName := dirutils.GetDirName(dir)
+	dirName := utils.GetDirName(dir)
 	if dirName == "unknown" {
 		log.Printf("Warning: Failed to get directory name for %s. Using 'unknown'.", dir)
 	}
 
 	if isJson {
 		format.DisplayJson(dirName, files)
+	} else if isMarkdown {
+		format.DisplayText(dirName, files)
 	} else {
 		format.DisplayText(dirName, files)
 	}

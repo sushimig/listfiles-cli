@@ -1,12 +1,16 @@
 package format
 
 import (
+	"fmt"
 	"os"
-	"strings"
 )
 
-func displayMarkdown(dirName string, files []os.DirEntry) {
-	var sb strings.Builder
+func DisplayMarkdown(dirName string, files []os.DirEntry) {
+	table := "| " + dirName + " |\n|------|\n"
 
-	sb.WriteString("")
+	for _, file := range files {
+		table += fmt.Sprintf("| %s |\n", file.Name())
+	}
+
+	fmt.Println(table)
 }

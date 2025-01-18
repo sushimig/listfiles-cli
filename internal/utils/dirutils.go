@@ -1,4 +1,4 @@
-package dirutils
+package utils
 
 import (
 	"fmt"
