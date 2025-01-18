@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"flag"
-	"listfiles-cli/internal/display"
 	"strings"
+
+	"github.com/sushimig/listfiles-cli/internal/display"
 )
 
 func Execute() {

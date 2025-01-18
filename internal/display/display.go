@@ -1,10 +1,11 @@
 package display
 
 import (
-	"listfiles-cli/internal/display/format"
-	"listfiles-cli/internal/utils"
 	"log"
 	"os"
+
+	"github.com/sushimig/listfiles-cli/internal/display/format"
+	"github.com/sushimig/listfiles-cli/internal/utils"
 )
 
 func Display(dir string, exts []string, isJson bool, isMarkdown bool) {
