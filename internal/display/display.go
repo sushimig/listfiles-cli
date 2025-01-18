@@ -11,7 +11,7 @@ import (
 func Display(dir string, exts []string, isJson bool) {
 	var (
 		files []os.DirEntry
-		err   error
+		err   errssor
 	)
 
 	absPath, err := dirutils.GetAbsPath(dir)

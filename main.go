@@ -1,3 +1,6 @@
+/*
+Copyright © 2025 sushiming
+*/
 package main
 
 import (
