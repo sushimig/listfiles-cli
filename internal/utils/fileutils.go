@@ -31,6 +31,7 @@ func GetSpecifiedExtFileName(absPath string, exts []string) ([]os.DirEntry, erro
 	return filesFiltered, nil
 }
 
+// this function judge based on whether exact match
 func containExt(fileName string, exts []string) bool {
 	fileExt := filepath.Ext(fileName)
 	for _, ext := range exts {
